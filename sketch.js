@@ -27,10 +27,16 @@ let qinaryColor;
 // control
 let currentPattern = 0;
 
-// scene 1
-var lineLength = 100;
-var angle = 0;
-var angleSpeed = 1;
+// pattern 1
+let centerX;
+let centerY;
+var formResolution = 15;
+var stepSize = 2;
+var distortionFactor = 1;
+var initRadius = 150;
+var x = [];
+var y = [];
+let filled = false;
 
 // screen saver
 var particles = [];
@@ -87,6 +93,15 @@ function setup() {
   // screen saver
   for (var i = 0; i < particleCount; i++) {
     particles[i] = new Particle(noiseZRange);
+  }
+
+  // pattern 1
+  centerX = width / 2;
+  centerY = height / 2;
+  var angle = radians(360 / formResolution);
+  for (var i = 0; i < formResolution; i++) {
+    x.push(cos(angle * i) * initRadius);
+    y.push(sin(angle * i) * initRadius);
   }
 }
 function mousePressed() {}
@@ -148,16 +163,35 @@ function draw() {
           noStroke();
           rect(0, 0, width, height);
         }
-        angleSpeed = map(height - leftHandY, 0, height, 1, 10);
-        lineLength = map(leftHandX, 0, width, 20, 200);
-        push();
-        translate(rightHandX, leftHandX);
-        rotate(radians(angle));
-        stroke(primaryColor);
-        line(0, 0, lineLength, 0);
-        pop();
+        // floating towards mouse position
+        centerX += (mouseX - centerX) * 0.01;
+        centerY += (mouseY - centerY) * 0.01;
 
-        angle += angleSpeed;
+        // calculate new points
+        for (var i = 0; i < formResolution; i++) {
+          x[i] += random(-stepSize, stepSize);
+          y[i] += random(-stepSize, stepSize);
+        }
+        stroke(primaryColor);
+        noFill();
+
+        // now, lets render the shape
+        beginShape();
+        // first controlpoint
+        curveVertex(
+          x[formResolution - 1] + centerX,
+          y[formResolution - 1] + centerY
+        );
+
+        // only these points are drawn
+        for (var i = 0; i < formResolution; i++) {
+          curveVertex(x[i] + centerX, y[i] + centerY);
+        }
+        curveVertex(x[0] + centerX, y[0] + centerY);
+
+        // end controlpoint
+        curveVertex(x[1] + centerX, y[1] + centerY);
+        endShape();
         break;
       }
     }
