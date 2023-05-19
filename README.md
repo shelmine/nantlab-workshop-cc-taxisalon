@@ -6,6 +6,7 @@
 * download this [repository](https://github.com/nantlab/nantlab-workshop-cc-taxisalon/archive/refs/heads/master.zip)
 * open it in visual studio code
 * right click on index.html and select open with live server
+* make the browser fullscreen and reload the page
 
 
 ## credits
