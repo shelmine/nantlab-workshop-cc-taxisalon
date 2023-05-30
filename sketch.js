@@ -40,6 +40,42 @@ var x = [];
 var y = [];
 let filled = false;
 
+//pattern 2
+var tileCount = 20;
+
+var moduleColor;
+var moduleAlpha = 180;
+var maxDistance = 500;
+
+//pattern 3
+var tileCount = 20;
+var actRandomSeed = 0;
+
+var actStrokeCap;
+
+var colorLeft;
+var colorRight;
+var alphaLeft = 255;
+var alphaRight = 255;
+
+//pattern 4
+var count = 0;
+var tileCountX = 10;
+var tileCountY = 10;
+var tileWidth = 0;
+var tileHeight = 0;
+
+var colorStep = 15;
+
+var circleCount = 0;
+var endSize = 0;
+var endOffset = 0;
+
+var actRandomSeed = 0;
+
+
+
+
 // screen saver
 var particles = [];
 var particleCount = 2000;
@@ -86,14 +122,7 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(mic);
 
-  //   lets assign colors here
-  backgroundColor = color(0);
-  primaryColor = color(38, 70, 83);
-  secondaryColor = color(42, 157, 143);
-  tertiaryColor = color(233, 196, 106);
-  quarternaryColor = color(244, 162, 97);
-  quinaryColor = color(231, 111, 81);
-
+  
   // screen saver
   for (var i = 0; i < particleCount; i++) {
     particles[i] = new Particle(noiseZRange);
@@ -147,6 +176,15 @@ function draw() {
   const highMidEnergy = fft.getEnergy("highMid");
   const trebleEnergy = fft.getEnergy("treble");
 
+  //   lets assign colors here
+  backgroundColor = color(0);
+  primaryColor = color(highMidEnergy, lowMidEnergy, bassEnergy);
+  secondaryColor = color(42, 157, bassEnergy);
+  tertiaryColor = color(233, 196, bassEnergy);
+  quarternaryColor = color(244, 162, bassEnergy);
+  quinaryColor = color(231, 111, bassEnergy);
+
+
   //   get skeleton positions
   if (pose) {
     noseX = pose.nose.x;
@@ -194,21 +232,83 @@ function draw() {
         beginShape();
         // first controlpoint
         curveVertex(
-          x[formResolution - 1] + centerX,
-          y[formResolution - 1] + centerY
+          x[formResolution - 1] + rightHandX,
+          y[formResolution - 1] + rightHandY
         );
 
         // only these points are drawn
         for (var i = 0; i < formResolution; i++) {
-          curveVertex(x[i] + centerX, y[i] + centerY);
+          curveVertex(x[i] + rightHandX, y[i] + rightHandY);
         }
-        curveVertex(x[0] + centerX, y[0] + centerY);
+        curveVertex(x[0] + rightHandX, y[0] + rightHandY);
 
         // end controlpoint
-        curveVertex(x[1] + centerX, y[1] + centerY);
+        curveVertex(x[1] + rightHandX, y[1] + rightHandY);
         endShape();
         break;
       }
+      case 1: {
+        if (newPersonDetected) {
+          // clear background if there is a new person
+          fill(tertiaryColor);
+          noStroke();
+          rect(0, 0, width, height);
+        }{
+          noFill();
+  strokeWeight(rightHandX/20);
+  moduleColor = color(primaryColor, secondaryColor, tertiaryColor, moduleAlpha);
+
+  clear();
+
+  stroke(moduleColor);
+
+  for (var gridY = 0; gridY < rightHandY; gridY += 10) {
+    for (var gridX = 0; gridX < width; gridX += 10) {
+      var diameter = dist(leftHandX, leftHandY, gridX, gridY);
+      diameter = diameter / maxDistance * 40;
+      push();
+      translate(gridX, gridY, diameter * 5);
+      rect(0, 0, diameter, diameter); // also nice: ellipse(...)
+      pop();
+  }
+        }
+        break;
+        }
+      }
+        
+        case 2: {
+           if (pose) {
+           actStrokeCap = SQUARE;
+  colorLeft = primaryColor
+  colorRight = tertiaryColor
+              strokeCap(actStrokeCap);
+
+  randomSeed(actRandomSeed);
+
+  for (var gridY = 0; gridY < tileCount; gridY++) {
+    for (var gridX = 0; gridX < tileCount; gridX++) {
+
+      var posX = width / tileCount * gridX;
+      var posY = height / tileCount * gridY;
+
+      var toggle = int(random(0, 2));
+
+      if (toggle == 0) {
+        stroke(colorLeft);
+        strokeWeight(rightHandX / 10);
+        line(posX, posY, posX + width / tileCount, posY + height / tileCount);
+      }
+      if (toggle == 1) {
+        stroke(colorRight);
+        strokeWeight (rightHandY / 10);
+        line(posX, posY + width / tileCount, posX + height / tileCount, posY);
+}
+        }          
+          
+        }
+      }
+}
+
     }
   } else {
     //     screensaver
