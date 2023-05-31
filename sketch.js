@@ -26,8 +26,8 @@ let quarternaryColor;
 let qinaryColor;
 
 // control
-// let currentPattern = -1;
-let currentPattern = 0;
+// let currentPattern = 0;
+let currentPattern = 1;
 
 // pattern 1
 let centerX;
@@ -60,21 +60,25 @@ var alphaRight = 255;
 
 //pattern 4
 var count = 0;
-var tileCountX = 10;
-var tileCountY = 10;
+var tileCountX = 30;
+var tileCountY = 30;
 var tileWidth = 0;
 var tileHeight = 0;
 
-var colorStep = 15;
+var colorStep = 20;
 
-var circleCount = 0;
+var circleCount = 20;
 var endSize = 0;
 var endOffset = 0;
 
 var actRandomSeed = 0;
 
+//pattern 5
+var count = 0;
+var tileCountX = 6;
+var tileCountY = 6;
 
-
+var drawMode = 1;
 
 // screen saver
 var particles = [];
@@ -90,6 +94,13 @@ var strokeWidth = 0.3;
 function setup() {
   //   TODO: render in webgl, so we can use shaders, but that is for later
   // createCanvas(640, 480, WEBGL);
+
+   setInterval(() => {
+    let numberOfPatterns = 4;
+    currentPattern = 
+    math.floor(math.random()*numberOfPatterns);
+   console.log("TODO: set pattern", currentPattern)
+   }, 30)
 
   var w = window.innerWidth;
   var h = window.innerHeight;
@@ -144,6 +155,16 @@ function mousePressed() {
   }
 }
 
+function keyPressed() {
+  if (key == "k"){
+    let numberOfPatterns = 6;
+    currentPattern = 
+    (currentPattern +1) %
+    numberOfPatterns;
+  }
+}
+  
+
 function gotPoses(results) {
   poses = results;
   if (poses.length > 0) {
@@ -179,10 +200,10 @@ function draw() {
   //   lets assign colors here
   backgroundColor = color(0);
   primaryColor = color(highMidEnergy, lowMidEnergy, bassEnergy);
-  secondaryColor = color(42, 157, bassEnergy);
-  tertiaryColor = color(233, 196, bassEnergy);
+  secondaryColor = color(42, bassEnergy, trebleEnergy);
+  tertiaryColor = color(bassEnergy, 196, trebleEnergy);
   quarternaryColor = color(244, 162, bassEnergy);
-  quinaryColor = color(231, 111, bassEnergy);
+  quinaryColor = color(highMidEnergy, 111, bassEnergy);
 
 
   //   get skeleton positions
@@ -199,7 +220,7 @@ function draw() {
   if (pose && timestamp < poseTimestamp + 5000) {
     // if there is a pose, then draw one of the patterns
     switch (currentPattern) {
-      case -1: {
+      case 0: {
         fill(backgroundColor);
         rect(0, 0, width, height);
         image(video, 0, 0, width, height);
@@ -207,7 +228,7 @@ function draw() {
         drawSkeleton();
         break;
       }
-      case 0: {
+      case 1: {
         if (newPersonDetected) {
           // clear background if there is a new person
           fill(backgroundColor);
@@ -247,7 +268,7 @@ function draw() {
         endShape();
         break;
       }
-      case 1: {
+      case 2: {
         if (newPersonDetected) {
           // clear background if there is a new person
           fill(tertiaryColor);
@@ -255,14 +276,14 @@ function draw() {
           rect(0, 0, width, height);
         }{
           noFill();
-  strokeWeight(rightHandX/20);
+  strokeWeight(rightHandX/30);
   moduleColor = color(primaryColor, secondaryColor, tertiaryColor, moduleAlpha);
 
   clear();
 
   stroke(moduleColor);
 
-  for (var gridY = 0; gridY < rightHandY; gridY += 10) {
+  for (var gridY = 0; gridY < height; gridY += 10) {
     for (var gridX = 0; gridX < width; gridX += 10) {
       var diameter = dist(leftHandX, leftHandY, gridX, gridY);
       diameter = diameter / maxDistance * 40;
@@ -276,7 +297,7 @@ function draw() {
         }
       }
         
-        case 2: {
+        case 3: {
            if (pose) {
            actStrokeCap = SQUARE;
   colorLeft = primaryColor
@@ -308,8 +329,123 @@ function draw() {
         }
       }
 }
+break;
 
+       case 4: {
+           if (pose) {
+        createCanvas(1920, 1080);
+  tileWidth = width / tileCountX / 1.5 ;
+  tileHeight = height / tileCountY / 1.5;
+  noFill();
+  stroke(primaryColor, 128);
+}
+
+  background(255);
+  randomSeed(actRandomSeed);
+
+  translate(tileWidth / 2, tileHeight / 2);
+
+  circleCount = rightHandX / 30 + 1;
+  endSize = map(rightHandX, 0, max(width, rightHandX), tileWidth / 2, 0);
+  endOffset = map(rightHandY, 0, max(height, rightHandY), 0, (tileWidth - endSize) / 2);
+
+  for (var gridY = 0; gridY <= tileCountY; gridY++) {
+    for (var gridX = 0; gridX <= tileCountX; gridX++) {
+      push();
+      translate(tileWidth * gridX, tileHeight * gridY);
+      scale(1, tileHeight / tileWidth);
+
+      var toggle = int(random(0, 4));
+      if (toggle == 0) rotate(-HALF_PI);
+      if (toggle == 1) rotate(0);
+      if (toggle == 2) rotate(HALF_PI);
+      if (toggle == 3) rotate(PI);
+
+      // draw module
+      for (var i = 0; i < circleCount; i++) {
+        var diameter = map(i, 0, circleCount, tileWidth, endSize);
+        var offset = map(i, 0, circleCount, 0, endOffset);
+        ellipse(offset, 0, diameter, diameter);
+      }
+      pop();
     }
+  }
+}
+break;
+
+case 5: {
+rectMode(CENTER);
+clear();
+noFill();
+stroke(primaryColor,secondaryColor,quinaryColor);
+strokeWeight(1);
+
+count = leftHandX / 10 + 10;
+var para = leftHandY / height;
+
+var tileWidth = width / tileCountX;
+var tileHeight = height / tileCountY;
+
+for (var gridY = 0; gridY <= tileCountY; gridY++) {
+for (var gridX = 0; gridX <= tileCountX; gridX++) {
+
+var posX = tileWidth * gridX + tileWidth / 2;
+var posY = tileHeight * gridY + tileHeight / 2;
+
+push();
+translate(posX, posY);
+
+// switch between modules
+switch (drawMode) {
+case 1:
+ stroke(primaryColor,secondaryColor,quinaryColor);
+  for (var i = 0; i < count; i++) {
+    rect(0, 0, tileWidth, tileHeight);
+    scale(1 - 3 / count);
+    rotate(para * 0.1);
+  }
+  break;
+case 2:
+  stroke(primaryColor,secondaryColor,quinaryColor);
+  for (var i = 0; i < count; i++) {
+    var gradient = lerpColor(color(0, 0), color(166, 141, 5), i / count);
+    fill(gradient, i / count * 200);
+    rotate(QUARTER_PI);
+    rect(0, 0, tileWidth, tileHeight);
+    scale(1 - 3 / count);
+    rotate(para * 1.5);
+  }
+  break;
+case 3:
+  stroke(primaryColor,secondaryColor,0);
+  for (var i = 0; i < count; i++) {
+    var gradient = lerpColor(color(0, 130, 164), color(255), i / count);
+    fill(gradient, 170);
+
+    push();
+    translate(4 * i, 0);
+    ellipse(0, 0, tileWidth / 4, tileHeight / 4);
+    pop();
+
+    push();
+    translate(-4 * i, 0);
+    ellipse(0, 0, tileWidth / 4, tileHeight / 4);
+    pop();
+
+    scale(1 - 1.5 / count);
+    rotate(para * 1.5);
+  }
+  break;
+}
+
+pop();
+
+}
+}
+}
+}
+
+    
   } else {
     //     screensaver
     fill(backgroundColor);
