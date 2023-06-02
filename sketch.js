@@ -12,6 +12,9 @@ let leftHandX;
 let leftHandY;
 let rightHandX;
 let rightHandY;
+let handX = 0;
+let handY = 0;
+let handDetected = false;
 
 // audio input
 let mic;
@@ -26,10 +29,10 @@ let quarternaryColor;
 let qinaryColor;
 
 // control
-// let currentPattern = 0;
-let currentPattern = 1;
+ let currentPattern = 1;
+//let currentPattern = 1;
 
-// pattern 1
+// pattern 2
 let centerX;
 let centerY;
 var formResolution = 15;
@@ -40,7 +43,7 @@ var x = [];
 var y = [];
 let filled = false;
 
-//pattern 2
+//pattern 3
 var tileCount = 20;
 
 var moduleColor;
@@ -65,9 +68,9 @@ var tileCountY = 30;
 var tileWidth = 0;
 var tileHeight = 0;
 
-var colorStep = 20;
+var colorStep = 10;
 
-var circleCount = 20;
+var circleCount = 10;
 var endSize = 0;
 var endOffset = 0;
 
@@ -154,15 +157,15 @@ function mousePressed() {
   }
 }
 setInterval(() => {
-  let numberOfPatterns = 5;
+  let numberOfPatterns = 7;
   currentPattern = 
   Math.floor(Math.random()*numberOfPatterns);
  console.log("TODO: set pattern", currentPattern)
- }, 40000)
+ }, 5000)
 
 function keyPressed() {
   if (key == "k"){
-    let numberOfPatterns = 6;
+    let numberOfPatterns = 7;
     currentPattern = 
     (currentPattern +1) %
     numberOfPatterns;
@@ -183,9 +186,15 @@ function gotPoses(results) {
     poseTimestamp = millis();
     pose = poses[0].pose;
     skeleton = poses[0].skeleton;
+    handX = pose.rightWrist.x;
+    handY = pose.rightWrist.y;
+    handDetected = true;
   } else {
     pose = null;
+    handDetected = false;
+    
   }
+  
 }
 
 function modelLoaded() {
@@ -220,26 +229,27 @@ function draw() {
     leftHandX = pose.leftWrist.x;
     rightHandY = pose.rightWrist.y;
     rightHandX = pose.rightWrist.x;
+    rightHandX= width - pose.rightWrist.x;
+    leftHandX= width - pose.leftWrist.x;
   }
 
   //   finally draw visuals
   if (pose && timestamp < poseTimestamp + 5000) {
     // if there is a pose, then draw one of the patterns
     switch (currentPattern) {
+      //skeleton
+      
+      //drawing circles
       case 0: {
-        fill(backgroundColor);
-        rect(0, 0, width, height);
-        image(video, 0, 0, width, height);
-        drawKeypoints();
-        drawSkeleton();
-        break;
-      }
-      case 1: {
         if (newPersonDetected) {
+
           // clear background if there is a new person
-          fill(backgroundColor);
+        
           noStroke();
-          rect(0, 0, width, height);
+          fill(backgroundColor);
+          rect(0, 0,width, height);
+          
+          
         }
         // floating towards mouse position
         // centerX += (mouseX - centerX) * 0.01;
@@ -274,39 +284,19 @@ function draw() {
         endShape();
         break;
       }
-      case 2: {
-        if (pose) {
-          // clear background if there is a new person
-          //createCanvas(1920, 1080);
-          fill(tertiaryColor);
-          noStroke();
-          rect(rightHandX, 0, rightHandX, rightHandY);
-        }{
-          noFill();
-  strokeWeight(rightHandX/8);
-  moduleColor = color(primaryColor, secondaryColor, tertiaryColor, moduleAlpha);
-
-  clear();
-
-  stroke(moduleColor);
-
-  for (var gridY = 0; gridY < height; gridY += 10) {
-    for (var gridX = 0; gridX < width; gridX += 10) {
-      var diameter = dist(leftHandX, leftHandY, gridX, gridY);
-      diameter = diameter / maxDistance * 40;
-      push();
-      translate(gridX, gridY, diameter * 5);
-      rect(0, 0, diameter, diameter); // also nice: ellipse(...)
-      pop();
-  }
-        }
+      case 1: {
+    
+        fill(backgroundColor);
+        rect(0, 0, width, height);
+        image(video, 0, 0, width, height);
+        drawKeypoints();
+        drawSkeleton();
         break;
-        }
-      }
-        
-        case 3: {
+      
+    }
+        case 2: {
            if (pose) {
-           actStrokeCap = SQUARE;
+           actStrokeCap = SQUAREs;
   colorLeft = primaryColor
   colorRight = tertiaryColor
               strokeCap(actStrokeCap);
@@ -323,7 +313,7 @@ function draw() {
 
       if (toggle == 0) {
         stroke(colorLeft);
-        strokeWeight(rightHandX / 10);
+        strokeWeight(rightHandX / 5);
         line(posX, posY, posX + width / tileCount, posY + height / tileCount);
       }
       if (toggle == 1) {
@@ -335,10 +325,11 @@ function draw() {
           
         }
       }
+      break;
 }
-break;
 
-       case 4: {
+//Kreise
+       case 3: {
         if (pose) {
         createCanvas(1920, 1080);
   tileWidth = width / tileCountX / 1.5 ;
@@ -352,7 +343,7 @@ break;
 
   translate(tileWidth / 2, tileHeight / 2);
 
-  circleCount = rightHandX / 30 + 1;
+  circleCount = rightHandX / 50 + 1;
   endSize = map(rightHandX, 0, max(width, rightHandX), tileWidth / 2, 0);
   endOffset = map(rightHandY, 0, max(height, rightHandY), 0, (tileWidth - endSize) / 2);
 
@@ -377,10 +368,13 @@ break;
       pop();
     }
   }
+  
 }
 break;
 
-case 5: {
+
+//Wellen
+case 4: {
   if (pose)
 rectMode(CENTER);
 clear();
@@ -450,15 +444,42 @@ pop();
 
 }
 }
+break;
+
 }
+
+
+
+//rectangles
+case 5: {
+  if(pose)
+  noStroke();
+  translate(x, height*3);
+  rectMode(CENTER);
+   background();
+  if (handDetected) {
+    let r2 = map(rightHandX, 0, width, 0, height);
+    let r1 = height - r2*2;
+
+    fill(237, 34, 93, r1);
+    rect(width / 2 + r1 / 2, height / 2, r1, r1);
+
+    fill(237, 34, 93, r2);
+    rect(width / 2 - r2 / 2, height / 2, r2, r2);
+    break;
+  }
 }
+
+
+}
+
 
     
   } else {
     //     screensaver
     fill(backgroundColor);
     noStroke();
-    rect(0, 0, width, height);
+    rect(0, 0, 1920, 1080);
 
     for (var i = 0; i < particleCount; i++) {
       if (i > particleCount / 2) {
