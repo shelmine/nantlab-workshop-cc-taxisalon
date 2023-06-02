@@ -95,12 +95,7 @@ function setup() {
   //   TODO: render in webgl, so we can use shaders, but that is for later
   // createCanvas(640, 480, WEBGL);
 
-   setInterval(() => {
-    let numberOfPatterns = 4;
-    currentPattern = 
-    math.floor(math.random()*numberOfPatterns);
-   console.log("TODO: set pattern", currentPattern)
-   }, 30)
+  
 
   var w = window.innerWidth;
   var h = window.innerHeight;
@@ -119,13 +114,17 @@ function setup() {
     false
   );
 
+  
+
   //   setup camera input
   video = createCapture(VIDEO);
   video.size(width, height);
 
+
   video.hide();
   poseNet = ml5.poseNet(video, modelLoaded);
   poseNet.on("pose", gotPoses);
+  
 
   //   setup audio input
   mic = new p5.AudioIn();
@@ -154,6 +153,12 @@ function mousePressed() {
     saveCanvas(getTimestamp(), "png");
   }
 }
+setInterval(() => {
+  let numberOfPatterns = 5;
+  currentPattern = 
+  Math.floor(Math.random()*numberOfPatterns);
+ console.log("TODO: set pattern", currentPattern)
+ }, 40000)
 
 function keyPressed() {
   if (key == "k"){
@@ -189,6 +194,7 @@ function modelLoaded() {
 
 function draw() {
   timestamp = millis();
+
 
   //   get audio features
   let spectrum = fft.analyze();
@@ -269,14 +275,15 @@ function draw() {
         break;
       }
       case 2: {
-        if (newPersonDetected) {
+        if (pose) {
           // clear background if there is a new person
+          //createCanvas(1920, 1080);
           fill(tertiaryColor);
           noStroke();
-          rect(0, 0, width, height);
+          rect(rightHandX, 0, rightHandX, rightHandY);
         }{
           noFill();
-  strokeWeight(rightHandX/30);
+  strokeWeight(rightHandX/8);
   moduleColor = color(primaryColor, secondaryColor, tertiaryColor, moduleAlpha);
 
   clear();
@@ -332,7 +339,7 @@ function draw() {
 break;
 
        case 4: {
-           if (pose) {
+        if (pose) {
         createCanvas(1920, 1080);
   tileWidth = width / tileCountX / 1.5 ;
   tileHeight = height / tileCountY / 1.5;
@@ -374,6 +381,7 @@ break;
 break;
 
 case 5: {
+  if (pose)
 rectMode(CENTER);
 clear();
 noFill();
