@@ -161,7 +161,7 @@ setInterval(() => {
   currentPattern = 
   Math.floor(Math.random()*numberOfPatterns);
  console.log("TODO: set pattern", currentPattern)
- }, 5000)
+ }, 20000)
 
 function keyPressed() {
   if (key == "k"){
@@ -238,6 +238,16 @@ function draw() {
     // if there is a pose, then draw one of the patterns
     switch (currentPattern) {
       //skeleton
+      case -1: {
+    
+        fill(backgroundColor);
+        rect(0, 0, width, height);
+        image(video, 0, 0, width, height);
+        drawKeypoints();
+        drawSkeleton();
+        break;
+      
+    }
       
       //drawing circles
       case 0: {
@@ -284,16 +294,7 @@ function draw() {
         endShape();
         break;
       }
-      case 1: {
-    
-        fill(backgroundColor);
-        rect(0, 0, width, height);
-        image(video, 0, 0, width, height);
-        drawKeypoints();
-        drawSkeleton();
-        break;
       
-    }
         case 2: {
            if (pose) {
            actStrokeCap = SQUAREs;
@@ -450,7 +451,7 @@ break;
 
 
 
-//rectangles
+rectangles
 case 5: {
   if(pose)
   noStroke();
